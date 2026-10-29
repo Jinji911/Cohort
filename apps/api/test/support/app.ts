@@ -3,6 +3,7 @@ import { buildApp } from "../../src/app.ts";
 import { createPrisma } from "../../src/db.ts";
 import { apiDatabaseUrl } from "./db.ts";
 import { createTestAuth } from "./tokens.ts";
+import type { StudentAiConfig } from "../../src/routes/student-ai.ts";
 
 export type TestApp = {
   app: FastifyInstance;
@@ -17,14 +18,15 @@ export type TestApp = {
  * The real app on the test database as `cohort_api`, trusting only the tokens this helper signs.
  * Callers close the owner pool themselves; `close` ends only the app and its own connections.
  */
-export async function createTestApp(): Promise<TestApp> {
+export async function createTestApp(options: { studentAi?: Partial<StudentAiConfig>; aiFetch?: typeof fetch } = {}): Promise<TestApp> {
   const prisma = createPrisma(apiDatabaseUrl);
   const auth = await createTestAuth();
   const app = await buildApp({
     prisma,
     verifyToken: auth.verifyToken,
     corsOrigin: "http://localhost:5173",
-    studentAi: { openaiModel: "gpt-4.1-mini", geminiModel: "gemini-2.5-flash" },
+    studentAi: { openaiModel: "gpt-4.1-mini", geminiModel: "gemini-2.5-flash", ...options.studentAi },
+    aiFetch: options.aiFetch,
   });
   return {
     app,
