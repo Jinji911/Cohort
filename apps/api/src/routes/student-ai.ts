@@ -57,10 +57,9 @@ async function askOpenAi(apiKey: string, model: string, messages: ChatMessage[],
 
 async function askGemini(apiKey: string, model: string, messages: ChatMessage[], fetcher: typeof fetch) {
   const url = new URL(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`);
-  url.searchParams.set("key", apiKey);
   const response = await fetcher(url, {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: { "content-type": "application/json", "x-goog-api-key": apiKey },
     body: JSON.stringify({
       systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
       contents: messages.map((message) => ({
