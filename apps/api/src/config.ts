@@ -3,24 +3,30 @@ import { z } from "zod";
 export type Config = {
   databaseUrl: string;
   supabaseUrl: string;
-  /** Where Supabase publishes the public keys that sign its access tokens. */
   jwksUrl: URL;
   issuer: string;
   audience: "authenticated";
   corsOrigin: string;
   port: number;
   host: string;
+  openaiApiKey?: string;
+  geminiApiKey?: string;
+  openaiModel: string;
+  geminiModel: string;
 };
 
 const envSchema = z.object({
   DATABASE_URL: z.string().min(1),
   SUPABASE_URL: z.url({ protocol: /^https?$/ }),
+  OPENAI_API_KEY: z.string().min(1).optional(),
+  GEMINI_API_KEY: z.string().min(1).optional(),
+  OPENAI_MODEL: z.string().min(1).default("gpt-4.1-mini"),
+  GEMINI_MODEL: z.string().min(1).default("gemini-2.5-flash"),
   CORS_ORIGIN: z.string().min(1).default("http://localhost:5173"),
   PORT: z.coerce.number().int().min(1).max(65535).default(3000),
   HOST: z.string().min(1).default("127.0.0.1"),
 });
 
-/** Reads and validates the API's environment. Throws if a required value is missing or invalid. */
 export function loadConfig(env: Record<string, string | undefined>): Config {
   const parsed = envSchema.parse(env);
   return {
@@ -32,5 +38,9 @@ export function loadConfig(env: Record<string, string | undefined>): Config {
     corsOrigin: parsed.CORS_ORIGIN,
     port: parsed.PORT,
     host: parsed.HOST,
+    openaiApiKey: parsed.OPENAI_API_KEY,
+    geminiApiKey: parsed.GEMINI_API_KEY,
+    openaiModel: parsed.OPENAI_MODEL,
+    geminiModel: parsed.GEMINI_MODEL,
   };
 }
