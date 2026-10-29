@@ -24,6 +24,7 @@ export async function createTestApp(): Promise<TestApp> {
     prisma,
     verifyToken: auth.verifyToken,
     corsOrigin: "http://localhost:5173",
+    studentAi: { openaiModel: "gpt-4.1-mini", geminiModel: "gemini-2.5-flash" },
   });
   return {
     app,
