@@ -15,14 +15,18 @@ const app = await buildApp({
     audience: config.audience,
   }),
   corsOrigin: config.corsOrigin,
+  studentAi: {
+    openaiApiKey: config.openaiApiKey,
+    geminiApiKey: config.geminiApiKey,
+    openaiModel: config.openaiModel,
+    geminiModel: config.geminiModel,
+  },
   logger: true,
 });
 app.addHook("onClose", async () => {
   await prisma.$disconnect();
 });
-
 for (const signal of ["SIGINT", "SIGTERM"] as const) {
   process.once(signal, () => void app.close());
 }
-
 await app.listen({ port: config.port, host: config.host });
