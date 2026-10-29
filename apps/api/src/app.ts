@@ -35,7 +35,7 @@ export type AppDependencies = {
 const UNAUTHORIZED_MESSAGE = "Sign in to continue.";
 
 function bearerToken(header: string | undefined): string {
-  const token = header ? /^Bearer\\s+(\\S+)$/i.exec(header)?.[1] : undefined;
+  const token = header ? /^Bearer\s+(\S+)$/i.exec(header)?.[1] : undefined;
   if (!token) throw new UnauthorizedError();
   return token;
 }
