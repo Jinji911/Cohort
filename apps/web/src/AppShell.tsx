@@ -42,7 +42,8 @@ export function AppShell() {
           <NavLink to="/" end>
             Dashboard
           </NavLink>{" "}
-          <NavLink to="/register">Registration</NavLink>
+          <NavLink to="/register">Registration</NavLink>{" "}
+          {me.data.userType === "student" && <NavLink to="/study-assistant">AI Study Assistant</NavLink>}
         </nav>
         {signOutButton}
       </header>
