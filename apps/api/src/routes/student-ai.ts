@@ -4,7 +4,7 @@ import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from "zod";
 import { ApiError } from "../errors.ts";
 
-type ProviderConfig = {
+export type StudentAiConfig = {
   openaiApiKey?: string;
   geminiApiKey?: string;
   openaiModel: string;
@@ -81,7 +81,7 @@ async function askGemini(apiKey: string, model: string, messages: ChatMessage[],
 }
 
 /** Student-only chat. Provider credentials and outbound calls remain on the API server. */
-export function studentAiRoutes(config: ProviderConfig, fetcher: typeof fetch = fetch): FastifyPluginAsync {
+export function studentAiRoutes(config: StudentAiConfig, fetcher: typeof fetch = fetch): FastifyPluginAsync {
   return async (app) => {
     const api = app.withTypeProvider<ZodTypeProvider>();
 
