@@ -5,6 +5,8 @@ import {
   GradesResponse,
   MeResponse,
   SectionsResponse,
+  StudentAiChatRequest,
+  StudentAiChatResponse,
   TermsResponse,
   type ApiErrorCode,
 } from "@cohort/contracts";
@@ -31,6 +33,7 @@ export type ApiClient = {
   enroll(sectionId: string): Promise<EnrollmentChange>;
   drop(sectionId: string): Promise<EnrollmentChange>;
   getMyGrades(): Promise<GradesResponse>;
+  studentAiChat(input: StudentAiChatRequest): Promise<StudentAiChatResponse>;
 };
 
 export type ApiClientOptions = {
@@ -96,5 +99,6 @@ export function createApiClient({ baseUrl, getAccessToken, onUnauthorized }: Api
     enroll: (sectionId) => request("POST", "/enrollments", EnrollmentChange, { sectionId }),
     drop: (sectionId) => request("DELETE", `/enrollments/${encodeURIComponent(sectionId)}`, EnrollmentChange),
     getMyGrades: () => request("GET", "/me/grades", GradesResponse),
+    studentAiChat: (input) => request("POST", "/student/ai/chat", StudentAiChatResponse, input),
   };
 }
