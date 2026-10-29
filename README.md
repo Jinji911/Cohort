@@ -142,3 +142,55 @@ npm run typecheck
 ```
 
 The database's own tests are described in [supabase/README.md](supabase/README.md).
+
+
+## Student AI study assistant (first increment)
+
+The student dashboard includes an **AI Study Assistant** at `/study-assistant`. The API exposes
+`POST /student/ai/chat`, accepts a Supabase access token, and routes the request to either OpenAI
+or Google Gemini. Provider keys stay in the API environment; they must never be added to the web
+app's `VITE_*` variables.
+
+Add the provider credentials to `apps/api/.env`:
+
+```bash
+OPENAI_API_KEY=<your OpenAI API key>
+GEMINI_API_KEY=<your Google AI Studio API key>
+OPENAI_MODEL=gpt-4.1-mini
+GEMINI_MODEL=gemini-2.5-flash
+```
+
+Either provider key can be omitted if that provider is not being used. Restart the API after
+changing environment variables.
+
+The feature is **off unless a tenant-level or student-role setting enables it**. An authorised
+AI settings administrator should enable the student feature for the intended tenant. For a
+controlled development tenant, this can be done in the Supabase SQL editor:
+
+```sql
+insert into public.ai_feature_settings (tenant_id, feature, role_key, enabled)
+select id, 'student_assistant', 'student', true
+from public.tenants
+where slug = '<tenant-slug>'
+on conflict (tenant_id, feature, role_key, offering_id)
+do update set enabled = excluded.enabled;
+```
+
+The endpoint checks that the signed-in account is a student and reads the feature switch under
+the caller's RLS context. A missing or disabled switch returns 403. Example request:
+
+```json
+{
+  "provider": "openai",
+  "messages": [
+    { "role": "user", "content": "Explain recursion with a simple example." }
+  ]
+}
+```
+
+This is the first chat increment, not the complete university knowledge assistant yet. It does
+not currently retrieve course documents or personal academic records, persist conversation
+history, or write rows to `ai_interactions`. Do not treat answers as authoritative university
+policy or assessment information, and avoid sending sensitive personal information. The next
+increment should add permission-filtered document retrieval, interaction/audit logging, and
+usage-budget enforcement before broader rollout.
